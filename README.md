@@ -1,220 +1,77 @@
-# Predicting Avocado Prices Using Facebook Prophet
+# Avocado Price Forecasting with Prophet
 
-A time series forecasting project that applies **Facebook Prophet** to the Hass Avocado Board retail dataset to predict future avocado prices nationally and at the regional level (West). The project covers exploratory analysis, data preparation, model fitting, 365-day forecasting, and seasonal decomposition.
+Business forecasting notebook using Facebook Prophet to model avocado price trends and seasonality from Hass Avocado Board retail scan data.
 
-![avocado](visualizations/00_cover_image.png)
+## Project Maturity
 
----
+Notebook forecasting project. This is useful as a clear business-time-series example, but it should be treated as a supporting project rather than a flagship ML engineering artifact.
 
-## Table of Contents
+## Problem
 
-- [Problem Statement](#problem-statement)
-- [Dataset](#dataset)
-- [Why Facebook Prophet?](#why-facebook-prophet)
-- [Part 1: National Price Forecast](#part-1-national-price-forecast)
-- [Part 2: West Region Forecast](#part-2-west-region-forecast)
-- [Tech Stack](#tech-stack)
-- [How to Run](#how-to-run)
-- [Project Structure](#project-structure)
-- [Key Takeaways](#key-takeaways)
-
----
-
-## Problem Statement
-
-Avocado prices are volatile and seasonally driven. This project uses historical weekly retail scan data from the Hass Avocado Board to:
-
-- Understand national and regional price trends and seasonality
-- Fit a time series model using Facebook Prophet
-- Generate 365-day price forecasts at the national level and for the West region specifically
-- Decompose forecasts into trend and seasonal components for interpretability
-
----
+Avocado prices vary by time, region, and season. This project explores whether Prophet can capture trend and seasonal components for national and West-region avocado prices.
 
 ## Dataset
 
-**Source:** [Hass Avocado Board](https://hassavocadoboard.com/) via Kaggle
-**Coverage:** Weekly retail scan data, 2015-2018, 54 U.S. regions
+Source: Hass Avocado Board data via Kaggle  
+Coverage: weekly retail scan data from 2015-2018 across U.S. regions
 
-Retail scan data comes directly from retailers' cash registers based on actual retail sales. The Average Price reflects a per-unit (per avocado) cost even when units are sold in bags. PLU codes apply to Hass avocados only -- other varieties such as greenskins are excluded.
+## Main Artifact
 
-| Column | Description |
-|---|---|
-| `Date` | Date of weekly observation |
-| `AveragePrice` | Average retail price per avocado |
-| `type` | Conventional or organic |
-| `year` | Year of observation |
-| `region` | U.S. city or regional aggregate |
-| `Total Volume` | Total avocados sold that week |
-| `4046` | Volume sold for PLU 4046 (small/medium Hass) |
-| `4225` | Volume sold for PLU 4225 (large Hass) |
-| `4770` | Volume sold for PLU 4770 (extra-large Hass) |
+- `Avocado_Prices_Prediction_STRIPPED.ipynb`: notebook with the forecasting workflow.
 
----
+## Included Visualizations
 
-## Why Facebook Prophet?
+The repository currently includes these visualization files:
 
-Prophet is purpose-built for business time series with strong seasonal patterns. It models the series as:
+- `visualizations/01_national_price_timeseries.png`
+- `visualizations/04_national_prophet_forecast.png`
+- `visualizations/05_national_prophet_components.png`
+- `visualizations/07_west_prophet_forecast.png`
+- `visualizations/08_west_prophet_components.png`
 
-```
-y(t) = trend(t) + seasonality(t) + holidays(t) + error(t)
-```
+## Methodology
 
-Three reasons it fits this problem well:
-1. Avocado prices follow clear yearly and weekly cycles tied to harvest schedules and events like Super Bowl demand spikes
-2. The dataset spans four years, giving Prophet enough signal to learn reliable seasonal patterns
-3. Prophet handles missing data and outliers without manual imputation, and its component decomposition makes results directly interpretable
+1. Load and inspect avocado price data.
+2. Prepare Prophet-compatible date and target columns.
+3. Fit a national price forecasting model.
+4. Fit a West-region forecasting model.
+5. Compare trend and seasonal components.
+6. Interpret forecast behavior and uncertainty intervals.
 
----
+## Local Setup
 
-## Part 1: National Price Forecast
-
-### Raw Price Time Series
-
-All observations sorted chronologically and plotted to establish the baseline trend and volatility pattern across the full dataset.
-
-![National Price Time Series](visualizations/01_national_price_timeseries.png)
-
----
-
-### Data Distribution: Observations by Region
-
-Count of weekly observations per U.S. region, confirming balanced coverage across markets.
-
-![Regions Distribution](visualizations/02_regions_distribution.png)
-
----
-
-### Data Distribution: Observations by Year
-
-Yearly observation counts confirming consistent data coverage from 2015 through 2018.
-
-![Year Distribution](visualizations/03_year_distribution.png)
-
----
-
-### Prophet Forecast: National (365 Days)
-
-The Prophet model was fit on `Date` (renamed to `ds`) and `AveragePrice` (renamed to `y`) across the full national dataset. A 365-day future dataframe was generated and the forecast was produced with upper and lower confidence intervals.
-
-![National Prophet Forecast](visualizations/04_national_prophet_forecast.png)
-
-The dark line is `yhat` (predicted mean). The shaded band represents the uncertainty interval (`yhat_lower` to `yhat_upper`), which widens appropriately as the forecast extends further into the future.
-
----
-
-### Prophet Components: National
-
-The component decomposition breaks the forecast into its trend, weekly seasonality, and yearly seasonality signals.
-
-![National Prophet Components](visualizations/05_national_prophet_components.png)
-
-- **Trend**: Shows the long-run direction of national avocado prices over the period
-- **Weekly**: Captures within-week price variation across retail scan days
-- **Yearly**: Reveals the seasonal cycle -- prices rise in winter/spring and soften in summer, consistent with harvest timing and consumer demand patterns (e.g., Super Bowl demand in February)
-
----
-
-## Part 2: West Region Forecast
-
-The same Prophet pipeline was re-run scoped to `region == 'West'` to capture regional price dynamics specific to West Coast markets.
-
-### Raw Price Time Series: West Region
-
-![West Price Time Series](visualizations/06_west_price_timeseries.png)
-
-The West region shows a tighter price range and different amplitude in seasonal swings compared to the national aggregate, reflecting proximity to California and Mexico production regions.
-
----
-
-### Prophet Forecast: West Region (365 Days)
-
-![West Prophet Forecast](visualizations/07_west_prophet_forecast.png)
-
----
-
-### Prophet Components: West Region
-
-![West Prophet Components](visualizations/08_west_prophet_components.png)
-
-The West region's component decomposition highlights differences in seasonal amplitude and trend slope compared to the national model, confirming that regional-level modeling adds meaningful precision beyond aggregate forecasts.
-
----
-
-## Tech Stack
-
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
-![Prophet](https://img.shields.io/badge/Facebook%20Prophet-1877F2?style=flat-square&logo=meta&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=flat-square)
-![Seaborn](https://img.shields.io/badge/Seaborn-2E4057?style=flat-square)
-![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=flat-square&logo=jupyter&logoColor=white)
-
----
-
-## How to Run
+Because the repository name starts with a hyphen, use `cd --` when entering the directory from a shell.
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/Agent007repo/-Avocado-Prices-Prediction.git
 cd -- -Avocado-Prices-Prediction
-
-# 2. Install dependencies
-pip install prophet pandas numpy matplotlib seaborn jupyter
-
-# 3. Download the dataset
-# Get avocado.csv from: https://www.kaggle.com/datasets/neuromusic/avocado-prices
-# Place it in the root directory
-
-# 4. Run the notebook
-jupyter notebook "Project 4 - Avocado Prices Prediction.ipynb"
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+jupyter notebook Avocado_Prices_Prediction_STRIPPED.ipynb
 ```
 
-> If Prophet installation fails, try: `conda install -c conda-forge prophet`
+Download `avocado.csv` from Kaggle and place it in the root directory before running the notebook.
 
----
+## Recruiter Signal
 
-## Project Structure
+This project shows practical forecasting, business interpretation, and time-series decomposition. It is easy for nontechnical reviewers to understand.
 
-```
--Avocado-Prices-Prediction/
-├── Project 4 - Avocado Prices Prediction.ipynb   # Main notebook (code only, no outputs)
-├── README.md                                      # This file
-└── visualizations/
-    ├── 00_cover_image.png
-    ├── 01_national_price_timeseries.png
-    ├── 02_regions_distribution.png
-    ├── 03_year_distribution.png
-    ├── 04_national_prophet_forecast.png
-    ├── 05_national_prophet_components.png
-    ├── 06_west_price_timeseries.png
-    ├── 07_west_prophet_forecast.png
-    └── 08_west_prophet_components.png
-```
+## Technical Reviewer Signal
 
----
+This is a basic forecasting notebook. To make it stronger, the notebook should be executed with outputs, forecast error metrics should be added, and the repository should be renamed without the leading hyphen.
 
-## Key Takeaways
+## Known Limitations
 
-- **Prophet captures seasonality cleanly** -- the yearly component confirms a consistent price cycle tied to harvest timing, with peaks in late winter/spring and troughs in summer
-- **National vs. regional dynamics differ** -- the West region shows meaningfully different trend slope and seasonal amplitude, confirming that region-level modeling adds value beyond aggregate forecasts
-- **Component decomposition is the real output** -- beyond point predictions, the trend and seasonality plots are what make Prophet valuable for business use cases: they explain *why* prices move, not just *what* they will be
-- **Confidence intervals behave correctly** -- uncertainty expands as the forecast horizon extends, which is the statistically appropriate behavior for this type of additive model
+- The notebook currently has stripped outputs.
+- Some original visualizations referenced by older README versions are not present.
+- Prophet is useful for interpretable seasonality but should be compared with simpler baselines and other forecasting methods.
+- Forecast quality should be measured with holdout metrics, not only visual inspection.
 
----
+## Recommended Next Improvements
 
-## About Prophet
-
-Prophet is open-source forecasting software released by Facebook's Core Data Science team.
-
-- Paper: [Forecasting at Scale (Taylor and Letham, 2018)](https://peerj.com/preprints/3190/)
-- Docs: [facebook.github.io/prophet](https://facebook.github.io/prophet/docs/quick_start.html)
-
----
-
-## Author
-
-**Samarth Annigeri**
-Master of Management in Analytics, McGill University
-[LinkedIn](https://www.linkedin.com/in/samarth-annigeri-14326a178/) | [Portfolio](https://theindianmagenta.notion.site/Product-Portfolio-f56b69796af74829a005df99d3cadf4b)
+- Rename repository to `avocado-price-forecasting`.
+- Re-run the notebook and keep outputs visible.
+- Add train/test forecast error metrics.
+- Add baseline comparisons.
+- Add all generated visualizations under `visualizations/`.
