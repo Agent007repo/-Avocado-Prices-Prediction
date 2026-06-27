@@ -1,0 +1,6 @@
+prophet
+pandas
+numpy
+matplotlib
+seaborn
+jupyter
