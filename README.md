@@ -1,63 +1,26 @@
 # Predicting Avocado Prices with Prophet
 
-This project forecasts Hass avocado prices using Facebook Prophet. It covers exploratory analysis, national and regional forecasting, seasonal decomposition, and business-readable interpretation of time-series components.
+A notebook for descriptive exploration and Prophet forecasts of weekly Hass avocado retail prices. National forecasts use the published `TotalUS` series for conventional avocados; the regional example uses `West`, also conventional. Regional and avocado-type observations are never pooled into duplicate timestamps.
 
-![avocado](visualizations/00_cover_image.png)
+## Run
 
-## What This Shows
-
-- Business time-series forecasting
-- Prophet model setup and interpretation
-- National vs. regional forecast comparison
-- Seasonality and trend decomposition
-- Communicating uncertainty through forecast intervals
-
-## Problem Statement
-
-Avocado prices are volatile and seasonally driven. This analysis uses weekly retail scan data to understand historical price behavior and generate 365-day forecasts at both national and West-region levels.
-
-## Dataset
-
-Source: Hass Avocado Board data via Kaggle
-
-Coverage: weekly retail scan data from 2015 to 2018 across U.S. regions.
-
-## Methodology
-
-1. Load and inspect weekly avocado price data.
-2. Prepare Prophet-compatible `ds` and `y` fields.
-3. Fit a national price model and generate a 365-day forecast.
-4. Repeat the workflow for the West region.
-5. Compare trend, weekly seasonality, yearly seasonality, and forecast uncertainty.
-
-## Key Takeaways
-
-- Prophet captures recurring seasonal price patterns in a business-readable way.
-- Regional modeling adds useful signal beyond the national aggregate.
-- Component decomposition is the most valuable output because it explains why prices move, not only what the point forecast is.
-- Forecast intervals widen over time, correctly reflecting greater long-horizon uncertainty.
-
-## Repository Contents
-
-| Path | Purpose |
-|---|---|
-| `Avocado_Prices_Prediction_STRIPPED.ipynb` | Main notebook without heavy embedded outputs |
-| `visualizations/` | Forecast and EDA images used in this README |
-| `README.md` | Project explanation and run guide |
-
-## How To Run
+Use Python 3.11+, install `requirements.txt`, and place the Hass Avocado Board/Kaggle `avocado.csv` in this directory. Open `Avocado_Prices_Prediction_STRIPPED.ipynb` in Jupyter and execute from the repository root.
 
 ```bash
-git clone https://github.com/Agent007repo/-Avocado-Prices-Prediction.git
-cd -- -Avocado-Prices-Prediction
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 jupyter notebook Avocado_Prices_Prediction_STRIPPED.ipynb
 ```
 
-Download `avocado.csv` from Kaggle and place it in the repository root before running the notebook.
+`forecast_data.py` validates the selected series, numeric prices, unique dates, and chronological order. Prophet models trend and yearly seasonality and produces 365 daily forecast dates. Daily and weekly seasonalities are disabled because the source has only weekly observations.
 
-## Recruiter Signal
+## Interpretation and validation
 
-This is a forecasting and business-analytics project. It is useful evidence for analyst, data product, and applied ML roles where interpretable time-series communication matters.
+Component plots describe fitted patterns; they do not identify causes of price changes. Forecast intervals are model assumptions, not independently calibrated uncertainty. The notebook does not implement a held-out forecasting benchmark or establish that a regional model improves predictive accuracy. Existing images under `visualizations/` are archived illustrations and may predate the corrected series selection.
+
+```bash
+python -m unittest discover -s tests -p test_regressions.py -v
+```
+
+Five regression tests cover filtering, date uniqueness, ordering, and invalid inputs. They do not validate Prophet accuracy or rerun the external dataset.
